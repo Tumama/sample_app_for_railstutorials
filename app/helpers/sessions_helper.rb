@@ -6,8 +6,6 @@ module SessionsHelper
 		session[:user_id] = user.id 
 	end
 
-
-
 	# 在持久会话中记住用户 
 	def remember(user)
         user.remember
@@ -15,6 +13,11 @@ module SessionsHelper
         cookies.permanent[:remember_token] = user.remember_token
 	end
 
+
+	# 如果指定用户是当前用户,返回 true
+	 def current_user?(user)
+		user == current_user 
+	 end
 
 	# 返回 cookie 中记忆令牌对应的用户 
 	def current_user
@@ -28,7 +31,6 @@ module SessionsHelper
 			end
 		end
 	end
-
 
 	# 如果用户已登录,返回 true,否则返回 false 
 	def logged_in?
@@ -48,5 +50,20 @@ module SessionsHelper
         session.delete(:user_id)
 		@current_user = nil 
 	end
+
+
+	# 重定向到存储的地址,或者默认地址
+ 	def redirect_back_or(default)
+        redirect_to(session[:forwarding_url] || default)		
+		session.delete(:forwarding_url)
+	end
+
+
+	# 存储以后需要获取的地址 
+	def store_location
+		session[:forwarding_url] = request.url if request.get? 
+	end
+
+
 
 end
